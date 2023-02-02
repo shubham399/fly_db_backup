@@ -14,6 +14,7 @@ To run this project, you will need to add the following environment variables to
 - `R2_ACCESS_ID` - R2 Access Id, equivalent to `AWS_ACCESS_ID`
 - `R2_ACCESS_SECRET` - R2 Access secret, equivalent to `AWS_ACCESS_SECRET`
 - `R2_BUCKET_NAME` - R2 bucket name.
+- (Optional) `UPTIME_HEARTBEAT` - URL to do a `GET` call when Backup workflow complete
 
 Please set these as Github Workflow actions secrets to run the Workflow with cronjob (on github Workflow)
 
