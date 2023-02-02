@@ -30,4 +30,5 @@ jobs:
           R2_ACCESS_ID: ${{ secrets.R2_ACCESS_ID }}
           R2_ACCESS_SECRET: ${{ secrets.R2_ACCESS_SECRET }}
           R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+          UPTIME_HEARTBEAT: ${{ secrets.UPTIME_HEARTBEAT }}
           APP_NAME: shubhkumar-vaultwarden

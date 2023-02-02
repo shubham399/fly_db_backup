@@ -2,6 +2,7 @@ import os
 import sh
 import time
 import boto3
+import requests
 from datetime import datetime
 
 account_id = os.getenv('R2_ACCOUNT_ID')
@@ -79,7 +80,9 @@ def fly_db_backup(
 
         print("[green] backup complete, uploading to sq")
         upload_file(filename)
-
+        heartbeat_url = os.getenv('UPTIME_HEARTBEAT')
+        if heartbeat_url:
+            requests.get(url=heartbeat_url)
         # end timer
         end = time.time()
         print(f"[green] Total runtime of the program is [red] {end - start}")
