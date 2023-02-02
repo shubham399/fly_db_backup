@@ -1,0 +1,31 @@
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  backup-db:
+    name: Backup DB
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+          curl -L https://fly.io/install.sh | sh
+          pip install -r requirements.txt
+      - name: Backup
+        run: |
+          python backup.py
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          PGPASSWORD: ${{ secrets.PGPASSWORD }}
+          APP_NAME: shubhkumar-vaultwarden
