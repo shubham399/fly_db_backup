@@ -14,13 +14,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          path: /
-          key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
       - name: Dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
           sudo apt-get install --yes postgresql-client
