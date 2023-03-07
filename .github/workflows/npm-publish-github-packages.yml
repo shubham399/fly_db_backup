@@ -15,5 +15,5 @@ jobs:
         with:
           node-version: 18
       - run: cd clean && npm i
-      - run: cd clean && node ./clean.mjs
+      - run: ls -ltr && cd clean && node ./clean.mjs
 
