@@ -16,4 +16,8 @@ jobs:
           node-version: 18
       - run: cd clean && npm i
       - run: ls -ltr  && node ./clean/cleanup.mjs
-
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_ID: ${{ secrets.R2_ACCESS_ID }}
+          R2_ACCESS_SECRET: ${{ secrets.R2_ACCESS_SECRET }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
