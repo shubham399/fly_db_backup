@@ -26,4 +26,3 @@ Please set these as Github Workflow actions secrets to run the Workflow with cro
 [![.github/workflows/backup.yml](https://github.com/shubham399/fly_db_backup/actions/workflows/backup.yml/badge.svg)](https://github.com/shubham399/fly_db_backup/actions/workflows/backup.yml)
 
 
-.
