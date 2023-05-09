@@ -8,7 +8,7 @@ A python3 application which take backup of `postgres` database and store snapsho
 To run this project, you will need to add the following environment variables to your .env file
 
 - `FLY_API_TOKEN` - API token to comunicate with [fly.io](https://fly.io)
-- `APP_NAME` - Fly Application name.
+- `APP_NAME` - Fly Application name. (DB Name)
 - `PGPASSWORD` - DB password 
 - `R2_ACCOUNT_ID` - R2 Account Id 
 - `R2_ACCESS_ID` - R2 Access Id, equivalent to `AWS_ACCESS_ID`
