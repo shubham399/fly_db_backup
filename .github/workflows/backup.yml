@@ -1,3 +1,4 @@
+name: Backup to Cloudflare
 on:
   schedule:
     - cron: "30 20 * * *"
