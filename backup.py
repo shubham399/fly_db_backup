@@ -79,7 +79,7 @@ def fly_db_backup(
         )
         print(process)
 
-        print("[green] backup complete, uploading to sq")
+        print("[green] backup complete, uploading to s3")
         upload_file(filename)
         heartbeat_url = os.getenv('UPTIME_HEARTBEAT')
         if heartbeat_url:
