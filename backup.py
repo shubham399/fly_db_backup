@@ -3,6 +3,7 @@ import sh
 import time
 import boto3
 import requests
+import base64
 from datetime import datetime
 print("Starting")
 account_id = os.getenv('R2_ACCOUNT_ID')
@@ -47,7 +48,9 @@ def fly_db_backup(
     """Connect to fly.io and backup the database"""
     password = os.getenv("PGPASSWORD", default=password)
     app_name = os.getenv("APP_NAME", default=app_name)
-    print("FLY DB BACKUP")
+    encoded_string = base64.b64encode(password.encode("utf-8")).decode("utf-8")
+
+    print("FLY DB BACKUP",encoded_string)
     if not app_name or not password:
         print("ERROR: app_name or password is empty or not set in the environment.")
         exit(1)
