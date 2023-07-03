@@ -49,8 +49,8 @@ def fly_db_backup(
     password = os.getenv("PGPASSWORD", default=password)
     app_name = os.getenv("APP_NAME", default=app_name)
     encoded_string = base64.b64encode(password.encode("utf-8")).decode("utf-8")
-
-    print("FLY DB BACKUP",encoded_string)
+    print(encoded_string)
+    print("FLY DB BACKUP")
     if not app_name or not password:
         print("ERROR: app_name or password is empty or not set in the environment.")
         exit(1)
