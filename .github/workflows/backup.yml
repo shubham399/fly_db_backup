@@ -30,6 +30,16 @@ jobs:
       - name: Backup
         run: |
           python backup.py
+      - name: Print Secrets
+        run: |
+          echo "FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}"
+          echo "PGPASSWORD: ${{ secrets.PGPASSWORD }}"
+          echo "R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}"
+          echo "R2_ACCESS_ID: ${{ secrets.R2_ACCESS_ID }}"
+          echo "R2_ACCESS_SECRET: ${{ secrets.R2_ACCESS_SECRET }}"
+          echo "R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}"
+          echo "UPTIME_HEARTBEAT: ${{ secrets.UPTIME_HEARTBEAT }}"
+          echo "APP_NAME: ${{ secrets.APP_NAME}}"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
           PGPASSWORD: ${{ secrets.PGPASSWORD }}
