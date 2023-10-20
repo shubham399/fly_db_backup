@@ -40,5 +40,5 @@ jobs:
           R2_ACCESS_ID: ${{ secrets.R2_ACCESS_ID }}
           R2_ACCESS_SECRET: ${{ secrets.R2_ACCESS_SECRET }}
           R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
-          UPTIME_HEARTBEAT: ${{ secrets.UPTIME_HEARTBEAT }}
+          UPTIME_HEARTBEAT: https://uptime.betterstack.com/api/v1/heartbeat/Dc2rBjNQsrpbLoa1XMjzvfHc
           APP_NAME: vaultwarden-app
