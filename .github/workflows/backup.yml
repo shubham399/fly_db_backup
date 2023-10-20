@@ -1,3 +1,4 @@
+name: Backup to Cloudflare
 on:
   schedule:
     - cron: "30 20 * * *"
@@ -9,6 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/pip
+            /var/cache/apt/archives
+            /opt/fly
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: Set up Python 3.10
         uses: actions/setup-python@v2
@@ -31,4 +41,4 @@ jobs:
           R2_ACCESS_SECRET: ${{ secrets.R2_ACCESS_SECRET }}
           R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
           UPTIME_HEARTBEAT: ${{ secrets.UPTIME_HEARTBEAT }}
-          APP_NAME: vaultwarden-db
+          APP_NAME: vaultwarden-app
