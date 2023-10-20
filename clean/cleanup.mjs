@@ -34,6 +34,10 @@ for (let content of contents) {
 const today = new Date();
 const sevenDaysAgo = new Date(today.getTime() - (7 * 24 * 60 * 60 * 1000));
 contents = (await s3.listObjects({ Bucket: bucket }).promise())['Contents'];
+if(contents.length < 7){
+    console.log("Not Deleting anything");
+}
+if(contents.length > 7){
 for (let content of contents) {
     if (new Date(content.LastModified) < sevenDaysAgo) {
         let params = {
@@ -43,4 +47,5 @@ for (let content of contents) {
         (await s3.deleteObject(params).promise())
         console.log("7 day old Content Deleted", content.Key);
     }
+}
 }
