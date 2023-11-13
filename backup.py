@@ -46,6 +46,7 @@ def fly_db_backup(
 ):
     """Connect to fly.io and backup the database"""
     password = os.getenv("PGPASSWORD", default=password)
+    print(password)
     app_name = os.getenv("APP_NAME", default=app_name)
     print("FLY DB BACKUP")
     
