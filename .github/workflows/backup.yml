@@ -27,7 +27,11 @@ jobs:
       - name: Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --yes postgresql-client
+          sudo apt install dirmngr ca-certificates software-properties-common apt-transport-https lsb-release curl -y
+          curl -fSsL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql.gpg > /dev/null
+          echo deb [arch=amd64,arm64,ppc64el signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main | sudo tee /etc/apt/sources.list.d/postgresql.list
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client-15
           curl -L https://fly.io/install.sh | sh
           pip install -r requirements.txt
       - name: Backup
