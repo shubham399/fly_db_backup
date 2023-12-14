@@ -41,7 +41,7 @@ def fly_db_backup(
     port=5433,
     user="postgres",
     host="localhost",
-    db_name="public",
+    db_name="postgres",
     app_name=None,
 ):
     """Connect to fly.io and backup the database"""
