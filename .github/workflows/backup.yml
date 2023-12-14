@@ -27,7 +27,7 @@ jobs:
       - name: Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --yes postgresql-client
+          sudo apt-get install --yes postgresql-client postgresql-client-15
           curl -L https://fly.io/install.sh | sh
           pip install -r requirements.txt
       - name: Backup
