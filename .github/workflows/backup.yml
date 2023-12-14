@@ -20,10 +20,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
       - uses: superfly/flyctl-actions/setup-flyctl@master
-      - name: Set up Python 3.10
+      - name: Set up Python 3.12
         uses: actions/setup-python@v2
         with:
-          python-version: 3.10
+          python-version: 3.12
       - name: Dependencies
         run: |
           sudo apt-get update
