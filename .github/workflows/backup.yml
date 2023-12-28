@@ -24,7 +24,7 @@ jobs:
             ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - name: Set up Python 3.12
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: 3.12
       - name: Dependencies
