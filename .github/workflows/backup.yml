@@ -2,15 +2,18 @@ name: Backup to Cloudflare
 on:
   schedule:
     - cron: "30 20 * * *"
+  push: 
+    branches:
+      - main
   workflow_dispatch:
-
+        
 jobs:
   backup-db:
     name: Backup DB
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cache/pip
@@ -23,11 +26,26 @@ jobs:
       - name: Set up Python 3.10
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          path: |
+            ~/.cache/pip
+            /var/cache/apt/archives
+            /opt/fly
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.12
       - name: Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install --yes postgresql-client
+          sudo apt install dirmngr ca-certificates software-properties-common apt-transport-https lsb-release curl -y
+          curl -fSsL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /usr/share/keyrings/postgresql.gpg > /dev/null
+          echo deb [arch=amd64,arm64,ppc64el signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main | sudo tee /etc/apt/sources.list.d/postgresql.list
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client-15
           curl -L https://fly.io/install.sh | sh
           pip install -r requirements.txt
       - name: Backup
@@ -40,5 +58,5 @@ jobs:
           R2_ACCESS_ID: ${{ secrets.R2_ACCESS_ID }}
           R2_ACCESS_SECRET: ${{ secrets.R2_ACCESS_SECRET }}
           R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
-          UPTIME_HEARTBEAT: https://uptime.betterstack.com/api/v1/heartbeat/Dc2rBjNQsrpbLoa1XMjzvfHc
-          APP_NAME: vaultwarden-db
+          UPTIME_HEARTBEAT: ${{ secrets.UPTIME_HEARTBEAT }}
+          APP_NAME: ${{ secrets.APP_NAME}}

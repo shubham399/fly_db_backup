@@ -4,7 +4,7 @@ import time
 import boto3
 import requests
 from datetime import datetime
-
+print("Starting")
 account_id = os.getenv('R2_ACCOUNT_ID')
 bucket_name = os.getenv('R2_BUCKET_NAME', default="my-bucket")
 if not account_id:
@@ -41,12 +41,15 @@ def fly_db_backup(
     port=5433,
     user="postgres",
     host="localhost",
-    db_name="public",
+    db_name="postgres",
     app_name=None,
 ):
     """Connect to fly.io and backup the database"""
     password = os.getenv("PGPASSWORD", default=password)
+    print(password)
     app_name = os.getenv("APP_NAME", default=app_name)
+    print("FLY DB BACKUP")
+    
     if not app_name or not password:
         print("ERROR: app_name or password is empty or not set in the environment.")
         exit(1)
@@ -78,7 +81,7 @@ def fly_db_backup(
         )
         print(process)
 
-        print("[green] backup complete, uploading to sq")
+        print("[green] backup complete, uploading to s3")
         upload_file(filename)
         heartbeat_url = os.getenv('UPTIME_HEARTBEAT')
         if heartbeat_url:
