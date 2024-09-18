@@ -4,7 +4,7 @@
 name: Cleanup And Delete 7 day old backuup
 on:
   schedule:
-    - cron: "00 21 * * *"
+    - cron: "00 15 * * *"
   workflow_dispatch:
 jobs:
   build:
