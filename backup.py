@@ -150,9 +150,11 @@ def fly_db_backup(
         db_connection = fly_db_connect(app_name=app_name, local_port=proxy_port)
         if not db_connection:
             # Error already logged in fly_db_connect
+            logging.error("Backup failed due to proxy connection error.")
             return # Exit if proxy failed
 
         # 2. Create backup directory
+        logging.info("Ensuring backup directory exists...")
         backup_dir = f"{app_name}_backup"
         try:
             # Use os.makedirs for potentially nested directories and exist_ok=True
@@ -163,6 +165,7 @@ def fly_db_backup(
             return # Cannot proceed without backup directory
 
         # 3. Define backup filename
+        logging.info("Generating backup filename...")
         current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S") # ISO-like format, better for sorting
         base_filename = f"{db_name}-backup-{current_time}.sql"
         local_backup_path = os.path.join(backup_dir, base_filename)
