@@ -178,6 +178,11 @@ def fly_db_backup(
                 "--host", db_host,
                 "--port", proxy_port,
                 "--username", db_user,
+                 "-F",
+            "p",
+            "-b", 
+            "-v",
+            "-f",
                 "--file", local_backup_path,
                 db_name,
                 _out=sys.stdout, # Stream pg_dump output if needed
