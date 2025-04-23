@@ -2,7 +2,7 @@ name: Backup to Cloudflare
 
 on:
   schedule:
-    # Runs daily at midnight UTC (adjust as needed)
+    # Runs daily at 14:30 UTC (adjust as needed)
     - cron: "30 14 * * *"
   workflow_dispatch: # Allows manual triggering
   push:
@@ -31,8 +31,7 @@ jobs:
             ${{ runner.os }}-pip-
 
       - name: Install Python dependencies
-        # Only run pip install if cache wasn't restored
-        if: steps.cache-pip.outputs.cache-hit != 'true'
+        # Run pip install only if cache wasn't restored or requirements changed
         run: pip install -r requirements.txt
 
       - name: Cache flyctl
@@ -47,7 +46,7 @@ jobs:
         if: steps.cache-flyctl.outputs.cache-hit != 'true'
         run: |
           curl -L https://fly.io/install.sh | sh
-          # Add flyctl to PATH for subsequent steps
+          # Add flyctl to PATH for subsequent steps in the job
           echo "$HOME/.fly/bin" >> $GITHUB_PATH
 
       - name: Cache PostgreSQL client
@@ -58,7 +57,7 @@ jobs:
           path: |
             /var/cache/apt/archives
             /var/lib/apt/lists
-            /usr/lib/postgresql
+            /usr/lib/postgresql* # Use wildcard for version flexibility
             /usr/share/postgresql*
             /usr/bin/pg_dump
             /usr/bin/psql
@@ -69,10 +68,13 @@ jobs:
         if: steps.cache-postgres.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
-          sudo apt-get install -y postgresql-client
-      - name: Install pip dependencies
-        run: pip install -r requirements.txt
-        
+          sudo apt-get install --yes --no-install-recommends postgresql-client
+
+      - name: Verify flyctl installation # ADDED verification step
+        run: |
+          which flyctl
+          flyctl version
+
       - name: Run backup script
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
