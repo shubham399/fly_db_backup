@@ -45,9 +45,19 @@ jobs:
         # Only run install if cache wasn't restored
         if: steps.cache-flyctl.outputs.cache-hit != 'true'
         run: |
+          set -e # Exit immediately if a command exits with a non-zero status.
+          echo "Installing flyctl..."
           curl -L https://fly.io/install.sh | sh
-          # Add flyctl to PATH for subsequent steps in the job
+          # REMOVED PATH update from here
+          echo "flyctl installation complete."
+
+      - name: Add flyctl to PATH # ADDED unconditional step
+        run: |
+          echo "Adding $HOME/.fly/bin to GITHUB_PATH"
           echo "$HOME/.fly/bin" >> $GITHUB_PATH
+
+      - name: Check PATH variable # Keep this for debugging
+        run: echo "Current PATH=$PATH"
 
       - name: Cache PostgreSQL client
         uses: actions/cache@v4
@@ -70,8 +80,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes --no-install-recommends postgresql-client
 
-      - name: Verify flyctl installation # ADDED verification step
+      - name: Verify flyctl installation
         run: |
+          echo "Verifying flyctl installation..."
           which flyctl
           flyctl version
 
