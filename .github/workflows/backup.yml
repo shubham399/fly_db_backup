@@ -5,6 +5,9 @@ on:
     # Runs daily at midnight UTC (adjust as needed)
     - cron: "30 14 * * *"
   workflow_dispatch: # Allows manual triggering
+  push:
+    branches:
+      - main # Or your preferred branch
 
 jobs:
   backup:
