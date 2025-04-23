@@ -70,7 +70,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
-
+      - name: Install pip dependencies
+        run: pip install -r requirements.txt
+        
       - name: Run backup script
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
