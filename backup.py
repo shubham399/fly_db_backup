@@ -26,7 +26,7 @@ UPTIME_HEARTBEAT_URL = os.getenv('UPTIME_HEARTBEAT')
 DEFAULT_DB_NAME = "postgres"
 DEFAULT_DB_USER = "postgres"
 DEFAULT_DB_HOST = "localhost"
-DEFAULT_PROXY_PORT = 5433
+DEFAULT_PROXY_PORT = 5499
 DEFAULT_DB_PORT = 5432 # The actual DB port inside the Fly network
 
 # --- Validate Configuration ---
@@ -90,7 +90,7 @@ def fly_db_connect(app_name, local_port=DEFAULT_PROXY_PORT, remote_port=DEFAULT_
                  pass # Ignore if stderr cannot be read
              return None
         logging.info("flyctl proxy seems to be running.")
-        return process
+        return True
     except sh.CommandNotFound:
         logging.error("`flyctl` command not found. Make sure it's installed and in your PATH.")
         return None
@@ -148,6 +148,7 @@ def fly_db_backup(
     try:
         # 1. Start the proxy connection
         db_connection = fly_db_connect(app_name=app_name, local_port=proxy_port)
+        print(f"🔍 ~  ~ backup.py:150 ~ {db_connection}:")
         if not db_connection:
             # Error already logged in fly_db_connect
             logging.error("Backup failed due to proxy connection error.")
@@ -181,11 +182,9 @@ def fly_db_backup(
                 "--host", db_host,
                 "--port", proxy_port,
                 "--username", db_user,
-                 "-F",
-            "p",
-            "-b", 
-            "-v",
-            "-f",
+                "-F", "p",
+                "-b", 
+                "-v",
                 "--file", local_backup_path,
                 db_name,
                 _out=sys.stdout, # Stream pg_dump output if needed
@@ -234,16 +233,6 @@ def fly_db_backup(
         # Catch any unexpected errors during the main backup logic
         logging.exception(f"An unexpected error occurred during the backup process: {e}")
     finally:
-        # 8. Ensure proxy connection is terminated
-        if db_connection and db_connection.is_alive():
-            logging.info("Terminating flyctl proxy process...")
-            try:
-                db_connection.terminate()
-                db_connection.wait() # Wait for termination
-                logging.info("flyctl proxy terminated.")
-            except Exception as e:
-                logging.error(f"Failed to terminate flyctl proxy process (PID: {db_connection.pid}): {e}")
-                logging.warning("You may need to manually kill the process.")
 
         end_time = time.time()
         logging.info(f"Backup process finished. Total runtime: {end_time - start_time:.2f} seconds.")
@@ -251,13 +240,13 @@ def fly_db_backup(
 
 # --- Main Execution ---
 if __name__ == "__main__":
-    logging.info("Starting Fly DB Backup Script")
+    # Run the backup with environment variables
     fly_db_backup(
         app_name=APP_NAME,
         db_password=PGPASSWORD,
-        # Optionally override defaults here if needed:
-        # db_name="other_db",
-        # db_user="other_user",
+        # Optional overrides can be added here if needed
+        # db_name="custom_db_name",
+        # db_user="custom_user",
+        # db_host="custom_host",
         # proxy_port=5434,
     )
-    logging.info("Fly DB Backup Script finished.")
