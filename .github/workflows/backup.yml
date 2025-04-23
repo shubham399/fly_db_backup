@@ -48,7 +48,6 @@ jobs:
           set -e # Exit immediately if a command exits with a non-zero status.
           echo "Installing flyctl..."
           curl -L https://fly.io/install.sh | sh
-          # REMOVED PATH update from here
           echo "flyctl installation complete."
 
       - name: Add flyctl to PATH # ADDED unconditional step
@@ -59,23 +58,10 @@ jobs:
       - name: Check PATH variable # Keep this for debugging
         run: echo "Current PATH=$PATH"
 
-      - name: Cache PostgreSQL client
-        uses: actions/cache@v4
-        id: cache-postgres
-        with:
-          # Cache the apt package state and relevant directories
-          path: |
-            /var/cache/apt/archives
-            /var/lib/apt/lists
-            /usr/lib/postgresql* # Use wildcard for version flexibility
-            /usr/share/postgresql*
-            /usr/bin/pg_dump
-            /usr/bin/psql
-          key: ${{ runner.os }}-postgres-client-v1 # Increment version if needed
+      # REMOVED Cache PostgreSQL client step
 
       - name: Install PostgreSQL client
-        # Only run install if cache wasn't restored
-        if: steps.cache-postgres.outputs.cache-hit != 'true'
+        # REMOVED if condition, install every time
         run: |
           sudo apt-get update
           sudo apt-get install --yes --no-install-recommends postgresql-client
