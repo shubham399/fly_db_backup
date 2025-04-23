@@ -86,7 +86,7 @@ def fly_db_connect(app_name, local_port=DEFAULT_PROXY_PORT, remote_port=DEFAULT_
                  pass
              return None # Return None on failure
         logging.info("flyctl proxy seems to be running.")
-        return process # Return the process handle on success
+        return True # Return the process handle on success
     except sh.CommandNotFound:
         logging.error("`flyctl` command not found. Make sure it's installed and in your PATH.")
         return None # Return None on failure
@@ -224,20 +224,8 @@ def fly_db_backup(
         sys.exit(1) # Exit script with error code 1
     finally:
         # This block always runs, even after sys.exit() is called
-        # Ensure proxy connection is terminated
-        if db_connection and hasattr(db_connection, 'is_alive') and db_connection.is_alive():
-            logging.info("Terminating flyctl proxy process (cleanup)...")
-            try:
-                db_connection.terminate()
-                db_connection.wait(timeout=5) # Wait briefly for termination
-                logging.info("flyctl proxy terminated.")
-            except sh.TimeoutException:
-                 logging.warning("flyctl proxy did not terminate gracefully, attempting kill...")
-                 db_connection.kill()
-            except Exception as term_err:
-                logging.error(f"Failed to terminate flyctl proxy process: {term_err}")
-                logging.warning(f"You may need to manually kill the process (PID: {db_connection.pid}).")
-
+        sh.killall("flyctl")
+        logging.info("Terminated all flyctl processes.")
         end_time = time.time()
         if backup_succeeded:
             logging.info(f"Backup process finished successfully. Total runtime: {end_time - start_time:.2f} seconds.")
