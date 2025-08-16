@@ -30,9 +30,9 @@ for (let content of contents) {
     }
     unqiue.set(content.ETag, "");
 }
-// Remove Content Older than 7 Days.
+// Remove Content Older than 3 Days.
 const today = new Date();
-const sevenDaysAgo = new Date(today.getTime() - (7 * 24 * 60 * 60 * 1000));
+const sevenDaysAgo = new Date(today.getTime() - (3 * 24 * 60 * 60 * 1000));
 contents = (await s3.listObjects({ Bucket: bucket }).promise())['Contents'];
 if(contents.length <= 7){
     console.log("Not Deleting anything");
