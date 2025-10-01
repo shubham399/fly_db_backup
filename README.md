@@ -3,7 +3,6 @@
 A Python 3 application that automates the backup of a PostgreSQL database and stores the snapshot in Cloudflare R2 (an S3-equivalent object storage service).
 
 ## Features
-
 - **Automated Backups**: Seamlessly backs up your PostgreSQL database.
 - **Cloudflare R2 Integration**: Store database snapshots in Cloudflare R2.
 - **Scheduled Backups**: Supports scheduled backups using GitHub Actions.
@@ -55,4 +54,4 @@ To automate backups with GitHub Actions, set these environment variables as GitH
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details. 
