@@ -1,5 +1,6 @@
 import os
 import sh
+import socket
 import time
 import boto3
 import requests
@@ -28,6 +29,7 @@ DEFAULT_DB_USER = "postgres"
 DEFAULT_DB_HOST = "localhost"
 DEFAULT_PROXY_PORT = 5499
 DEFAULT_DB_PORT = 5432 # The actual DB port inside the Fly network
+PROXY_STARTUP_TIMEOUT = 30 # Max seconds to wait for the proxy to accept connections
 
 # --- Validate Configuration ---
 required_vars = {
@@ -59,34 +61,71 @@ except Exception as e:
     sys.exit(1)
 
 
+def port_is_open(host, port, timeout=1.0):
+    """Returns True if a TCP connection to host:port succeeds."""
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except OSError:
+        return False
+
+
+def wait_for_port(process, host, port, timeout=PROXY_STARTUP_TIMEOUT):
+    """
+    Waits until the port accepts connections, the proxy process dies, or the
+    timeout is reached. Returns True only if the port became reachable.
+    """
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        if port_is_open(host, port):
+            return True
+        if not process.is_alive():
+            return False
+        time.sleep(1)
+    return False
+
+
 def fly_db_connect(app_name, local_port=DEFAULT_PROXY_PORT, remote_port=DEFAULT_DB_PORT):
     """
     Establishes a background proxy connection to the Fly database.
-    Returns the running process handle. Returns None on failure.
+    Returns True on success. Returns None on failure.
     """
     logging.info(f"Attempting to start flyctl proxy for app '{app_name}' ({local_port}:{remote_port})...")
+    flyctl_output = []
+
+    def log_flyctl_output(line):
+        line = line.rstrip()
+        if line:
+            flyctl_output.append(line)
+            logging.info(f"flyctl: {line}")
+
     try:
-        # Run flyctl proxy in the background (_bg=True)
+        # Run flyctl proxy in the background (_bg=True) and capture its output
         process = sh.flyctl(
             "proxy", f"{local_port}:{remote_port}",
             "--app", app_name,
             _bg=True,
             _bg_exc=False, # Don't raise exception immediately on background error
-            # _out=logging.info, # Uncomment to log flyctl output
-            # _err=logging.warning # Uncomment to log flyctl errors
+            _out=log_flyctl_output,
+            _err=log_flyctl_output,
         )
-        logging.info(f"flyctl proxy process started (PID: {process.pid}). Waiting for connection...")
-        time.sleep(5) # Give the proxy time to establish connection
-        if not process.is_alive():
-             logging.error("flyctl proxy process failed to start or terminated unexpectedly.")
-             try:
-                 stderr_output = process.stderr.decode()
-                 logging.error(f"flyctl proxy stderr: {stderr_output}")
-             except Exception:
-                 pass
-             return None # Return None on failure
-        logging.info("flyctl proxy seems to be running.")
-        return True # Return the process handle on success
+        logging.info(f"flyctl proxy process started (PID: {process.pid}). "
+                     f"Waiting up to {PROXY_STARTUP_TIMEOUT}s for it to accept connections...")
+
+        if not wait_for_port(process, DEFAULT_DB_HOST, local_port):
+            if process.is_alive():
+                logging.error(f"flyctl proxy did not open port {local_port} within "
+                              f"{PROXY_STARTUP_TIMEOUT}s.")
+            else:
+                logging.error("flyctl proxy process terminated before the port was ready.")
+            if flyctl_output:
+                logging.error("Last flyctl output:\n" + "\n".join(flyctl_output[-20:]))
+            else:
+                logging.error("flyctl produced no output.")
+            return None # Return None on failure
+
+        logging.info(f"flyctl proxy is accepting connections on {DEFAULT_DB_HOST}:{local_port}.")
+        return True # Return success
     except sh.CommandNotFound:
         logging.error("`flyctl` command not found. Make sure it's installed and in your PATH.")
         return None # Return None on failure
@@ -224,8 +263,12 @@ def fly_db_backup(
         sys.exit(1) # Exit script with error code 1
     finally:
         # This block always runs, even after sys.exit() is called
-        sh.killall("flyctl")
-        logging.info("Terminated all flyctl processes.")
+        try:
+            # killall exits with 1 when no matching process exists
+            sh.killall("flyctl", _ok_code=[0, 1])
+            logging.info("Terminated all flyctl processes.")
+        except sh.ErrorReturnCode as e:
+            logging.warning(f"Could not terminate flyctl processes: {e}")
         end_time = time.time()
         if backup_succeeded:
             logging.info(f"Backup process finished successfully. Total runtime: {end_time - start_time:.2f} seconds.")

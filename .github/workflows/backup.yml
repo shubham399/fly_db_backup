@@ -14,15 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.x' # Or specify your exact Python version
 
       - name: Cache pip dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         id: cache-pip # Give the cache step an ID
         with:
           path: ~/.cache/pip
@@ -35,7 +35,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Cache flyctl
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         id: cache-flyctl
         with:
           path: ~/.fly/bin # Default installation path for flyctl

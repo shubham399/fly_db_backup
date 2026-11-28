@@ -1,21 +1,21 @@
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
-# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
-
 name: Cleanup And Delete 7 day old backuup
 on:
   schedule:
     - cron: "00 15 * * *"
   workflow_dispatch:
 jobs:
-  build:
+  cleanup:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: clean
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 18
-      - run: cd clean && npm i
-      - run: ls -ltr  && node ./clean/cleanup.mjs
+          node-version: 26 # Latest Node.js LTS
+      - run: npm install
+      - run: node cleanup.mjs
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_ACCESS_ID: ${{ secrets.R2_ACCESS_ID }}
